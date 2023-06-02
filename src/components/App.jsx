@@ -1,16 +1,17 @@
-export const App = () => {
-  return (
-    <div
-      style={{
-        height: '100vh',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        fontSize: 40,
-        color: '#010101'
-      }}
-    >
-      React homework template
-    </div>
-  );
-};
+import React from 'react';
+import Serchbar from './Searchbar/Searchbar';
+
+export default class App extends React.Component {
+  state = {
+    serchQuery: '',
+  };
+
+  handelOnSubmit = serchQuery => {
+    this.setState({  serchQuery });
+    console.log(serchQuery)
+  };
+
+  render() {
+    return <Serchbar onSubmit={this.handelOnSubmit} />;
+  }
+}
