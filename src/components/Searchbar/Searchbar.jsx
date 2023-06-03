@@ -3,22 +3,22 @@ import css from '../styles.module.css';
 
 export default class Serchbar extends React.Component {
   state = {
-    serchQuery: '',
+    searchQuery: '',
   };
 
   handelQueryChenge = event => {
-    this.setState({ serchQuery: event.currentTarget.value.toLowerCase() });
+    this.setState({ searchQuery: event.currentTarget.value.toLowerCase() });
   };
 
   handelSubmit = event => {
     event.preventDefault();
 
-    if (this.state.serchQuery.trim() === '') {
+    if (this.state.searchQuery.trim() === '') {
       return alert('Введите ваш запрос');
     }
 
-    this.props.onSubmit(this.state.serchQuery);
-    this.setState({ serchQuery: '' });
+    this.props.onSubmit(this.state.searchQuery);
+    this.setState({ searchQuery: '' });
   };
 
   render() {
@@ -26,14 +26,14 @@ export default class Serchbar extends React.Component {
       <header className={css.Searchbar}>
         <form className={css.SearchForm} onSubmit={this.handelSubmit}>
           <button type="submit" className={css.SearchFormButton}>
-            <span className={css.SearchFormButtonLabel}>Search</span>
+            <span className={css.SearchFormButtonLabel}>S</span>
           </button>
 
           <input
             className={css.SearchFormInput}
             type="text"
-            autocomplete="off"
-            autofocus
+            autoComplete="off"
+            autoFocus
             placeholder="Search images and photos"
             onChange={this.handelQueryChenge}
           />
