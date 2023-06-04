@@ -14,51 +14,46 @@ export default class App extends React.Component {
     images: null,
     error: null,
     currentPage: 1,
-    totalPages: 0,
+    showPages: false,
     showModal: false,
     selectedImage: '',
     isLoading: false,
   };
 
   componentDidUpdate(_, prevState) {
-    if (prevState.searchQuery !== this.state.searchQuery) {
-      this.setState({
-        images: [],
-        currentPage: 1,
-        error: null,
-      });
-    }
-
-    if (prevState.searchQuery !== this.state.searchQuery) {
+    if (
+      prevState.searchQuery !== this.state.searchQuery ||
+      prevState.currentPage !== this.state.currentPage
+    ) {
       this.fetchImages();
     }
   }
 
   fetchImages = async () => {
     const { currentPage, searchQuery } = this.state;
-    this.setState({ isLoading: true, error: null }); // Додано обнулення помилки
-  
+    this.setState({ isLoading: true });
+
     try {
       const data = await getImages({ searchQuery, currentPage });
-  
+
       if (!data.hits) {
         throw new Error('No matches found');
       }
-  
+
       if (data.hits.length > 0) {
         this.setState(prevState => ({
           images: [...prevState.images, ...data.hits],
-          isLoading: false,
+          showPages: this.state.currentPage < Math.ceil(data.totalHits / 12 )
         }));
       } else {
-        // Додано перевірку на пустий результат
         this.setState({ isLoading: false, error: 'No images found' });
       }
     } catch (error) {
-      this.setState({ error: error.message, isLoading: false });
+      this.setState({ error: error.message });
+    } finally {
+      this.setState({ isLoading: false });
     }
   };
-  
 
   handleImageClick = image => {
     this.setState({ showModal: true, selectedImage: image.largeImageURL });
@@ -70,20 +65,25 @@ export default class App extends React.Component {
 
   handelOnSubmit = searchQuery => {
     this.setState({ searchQuery });
+    this.setState({
+      images: [],
+      currentPage: 1,
+      error: null,
+    });
   };
 
   handleLoadMore = () => {
     this.setState(
-      prevState => ({ currentPage: prevState.currentPage + 1 }),
-      () => {
-        this.fetchImages();
-      }
+      prevState => ({ currentPage: prevState.currentPage + 1 })
+      // // () => {
+      // //   this.fetchImages();
+      // }
     );
   };
 
   render() {
-    const { images, isLoading, error } = this.state;
-  
+    const { images, isLoading, error,showPages } = this.state;
+
     return (
       <>
         <Serchbar onSubmit={this.handelOnSubmit} />
@@ -100,10 +100,8 @@ export default class App extends React.Component {
             <Oval color="#00BFFF" height={80} width={80} />
           </div>
         )}
-        {error && (
-          <div className={css.ErrorContainer}>{error}</div>
-        )}
-        {!isLoading && !error && images && (
+        {error && <div className={css.ErrorContainer}>{error}</div>}
+        {showPages && !isLoading && !error && images && (
           <LoadMore onClick={this.handleLoadMore} />
         )}
         {this.state.showModal && (
@@ -115,7 +113,4 @@ export default class App extends React.Component {
       </>
     );
   }
-  
-  
-  
 }
